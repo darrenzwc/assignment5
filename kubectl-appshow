@@ -1,22 +1,60 @@
 #!/bin/bash
 
-if (( $# < 2 )); then
+if (( $# != 2 )); then
   echo "kubectl appshow <kind> <instance>"
-  exit 0
+  exit 1
 fi
 
-echo "TODO (see assignment requirements)"
+kind=$1
+instance=$2
 
-# Requirement 4.1
-# Take following inputs in order
-# kind
-# instance
-# 
-# Check if input instance exists or not for the provided kind
-# This can be done using: kubectl get <kind>
-# If the instance does not exist, return "Instance <instance> does not exist for Kind <kind>."
-#
-# If the instance exists, query the corresponding namespace to find out
-# Pods, Deployment, Configmap, ServiceAccount, NetworkPolicy
+# KubePlus stores the custom resource in its provider namespace.  The
+# resource's status.helmrelease value identifies the namespace created for
+# that specific application instance as "<namespace>:<helm-release>".
+instance_namespace=$(kubectl get "$kind" -A --no-headers 2>/dev/null \
+  | awk -v instance="$instance" '$2 == instance { print $1; exit }')
+
+if [[ -z "$instance_namespace" ]]; then
+  echo "Instance $instance does not exist for Kind $kind."
+  exit 1
+fi
+
+helmrelease=$(kubectl get "$kind" "$instance" -n "$instance_namespace" \
+  -o jsonpath='{.status.helmrelease}' 2>/dev/null)
+target_namespace=${helmrelease%%:*}
+
+if [[ -z "$target_namespace" || "$target_namespace" == "$helmrelease" ]]; then
+  echo "Unable to determine the application namespace for $kind $instance." >&2
+  exit 1
+fi
+
+get_name() {
+  local resource=$1
+  local selector=${2:-}
+
+  if [[ -n "$selector" ]]; then
+    kubectl get "$resource" -n "$target_namespace" -l "$selector" \
+      -o jsonpath='{.items[0].metadata.name}' 2>/dev/null
+  else
+    kubectl get "$resource" -n "$target_namespace" \
+      -o jsonpath='{.items[0].metadata.name}' 2>/dev/null
+  fi
+}
+
+pod=$(get_name pod 'app=greetings')
+deployment=$(get_name deployment 'app=greetings')
+configmap=$(get_name configmap 'app=greetings')
+serviceaccount=$(get_name serviceaccount 'app=greetings')
+# KubePlus adds a NetworkPolicy to every instance namespace.  It is the only
+# NetworkPolicy expected in the namespace it creates for this assignment.
+networkpolicy=$(get_name networkpolicy)
+
+printf '{\n'
+printf '  "pod": "%s",\n' "$pod"
+printf '  "deployment": "%s",\n' "$deployment"
+printf '  "configmap": "%s",\n' "$configmap"
+printf '  "serviceaccount": "%s",\n' "$serviceaccount"
+printf '  "networkpolicy": "%s"\n' "$networkpolicy"
+printf '}\n'
 
 

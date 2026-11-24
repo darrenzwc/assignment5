@@ -1,6 +1,6 @@
 #!/bin/bash
 
 # Requirement 1.1
-docker build -t gcr.io/<gcp-project-id>/<uteid>-assignment4:latest .
-docker push gcr.io/<gcp-project-id>/<uteid>-assignment4:latest
+docker build -t gcr.io/final-project-515420/dc49996-assignment5:latest .
+docker push gcr.io/final-project-515420/dc49996-assignment5:latest
 

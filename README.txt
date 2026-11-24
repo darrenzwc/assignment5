@@ -62,8 +62,8 @@ until kubectl get pods -A | grep kubeplus | grep Running; do echo "Waiting for K
 
    # Requirement 1.1
    # Note that we do not need to connect Docker CLI on our host to the Docker daemon inside minikube (Why?)
-   docker build -t gcr.io/<gcp-project-id>/<uteid>-assignment4:latest .
-   docker push gcr.io/<gcp-project-id>/<uteid>-assignment4:latest
+   docker build -t gcr.io/final-project-515420/dc49996-assignment5:latest .
+   docker push gcr.io/final-project-515420/dc49996-assignment5:latest
 
    - FOR Mac with ARM processor:
       The image default using above command will be for ARM architecture.
@@ -109,7 +109,13 @@ until kubectl get pods -A | grep kubeplus | grep Running; do echo "Waiting for K
 
 APP URL:
 ---------
-Include your app endpint app url here:
+name: <your name>
+eid: dc49996
+gcp-project-id: final-project-515420
+image: gcr.io/final-project-515420/dc49996-assignment5:latest
+appURL1: Pending GKE deployment; expected form http://<worker-node-ip>:32760
+appURL2: Pending GKE deployment; expected form http://<worker-node-ip>:32761
+comments: Cluster creation, image push, and application deployment are intentionally deferred until December.
 
 
 NOTE:
