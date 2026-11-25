@@ -42,7 +42,10 @@ get_name() {
 }
 
 pod=$(get_name pod 'app=greetings')
-deployment=$(get_name deployment 'app=greetings')
+# Helm adds its own metadata labels to the Deployment, while the Pod template
+# carries app=greetings. Each KubePlus instance has an isolated namespace and
+# exactly one application Deployment, so query it without the Pod label filter.
+deployment=$(get_name deployment)
 configmap=$(get_name configmap 'app=greetings')
 serviceaccount=$(get_name serviceaccount 'app=greetings')
 # KubePlus adds a NetworkPolicy to every instance namespace.  It is the only

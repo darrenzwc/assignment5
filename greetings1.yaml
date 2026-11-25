@@ -3,6 +3,7 @@ kind: Greeting
 metadata:
   name: greetings1
 spec:
+  REPLICAS: 1
   GREETING: "This is greeting1"
   NODE_PORT: 32760
   IMAGE: "gcr.io/final-project-515420/dc49996-assignment5:latest"
